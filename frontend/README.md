@@ -1,76 +1,70 @@
-# 🌐 Pet Dinner — Web 端
+# 🌐 Pet Dinner — Web App
 
-基于 **React + Vite + Tailwind CSS** 构建的宠物友好餐厅 Web 应用。
+The browser-based interface for Pet Dinner, built with **React + Vite + Tailwind CSS**.
 
 ---
 
-## 环境要求
+## Prerequisites
 
 - Node.js 18+
-- 后端服务已启动（默认 `http://localhost:3001`）
+- Backend running on `http://localhost:3001` (see root README)
 
 ---
 
-## 启动开发环境
+## Development
 
 ```bash
-# 1. 安装依赖
+# Install dependencies
 npm install
 
-# 2. 启动开发服务器
+# Start the dev server
 npm run dev
 ```
 
-访问 `http://localhost:5173`
-
-Vite 已配置代理，所有 `/api` 请求自动转发到 `localhost:3001`，无需手动处理跨域。
+Open `http://localhost:5173`. Vite proxies all `/api` requests to `localhost:3001`, so no CORS configuration is needed during development.
 
 ---
 
-## 构建生产版本
+## Production Build
 
 ```bash
-npm run build
+npm run build       # outputs to dist/
+npm run preview     # serve the build locally to verify
 ```
 
-产物输出到 `dist/` 目录。可用任意静态服务器托管，或配合后端直接 serve：
-
-```bash
-# 预览构建结果
-npm run preview
-```
+For production deployment, either serve the `dist/` folder via a static CDN/host (update the API base URL accordingly) or configure Nginx to reverse-proxy `/api` to the backend.
 
 ---
 
-## 页面说明
+## Pages
 
-| 路由 | 页面 | 说明 |
-|------|------|------|
-| `/` | 首页 | 餐厅列表、搜索筛选、添加餐厅 |
-| `/map` | 地图页 | Leaflet 交互地图，爪印标注餐厅位置 |
-| `/community` | 社区页 | 最新评价动态流 + 外出指南 |
-| `/analytics` | 数据分析 | 图表仪表盘 + 市场洞察建议 |
-| `/restaurant/:id` | 餐厅详情 | 完整信息、评价列表、写评价 |
+| Route | Page | Description |
+|-------|------|-------------|
+| `/` | Home | Restaurant grid, search bar, multi-filter panel, add-restaurant button |
+| `/map` | Map | Leaflet interactive map with paw-print markers; sidebar list |
+| `/community` | Community | Live review feed and collapsible dining-with-pets guides |
+| `/analytics` | Analytics | Charts dashboard with market insights and recommendations |
+| `/restaurant/:id` | Detail | Full info, facility list, review thread, write-a-review modal |
 
 ---
 
-## 目录结构
+## Directory Structure
 
 ```
 frontend/
 ├── index.html
-├── vite.config.js          # 开发代理配置
+├── vite.config.js          # Dev proxy to backend
 ├── tailwind.config.js
 └── src/
-    ├── App.jsx             # 路由定义
-    ├── index.css           # Tailwind 全局样式
+    ├── App.jsx             # Route definitions
+    ├── index.css           # Tailwind base + custom utilities
     ├── main.jsx
     ├── components/
-    │   ├── Navbar.jsx          # 顶部导航（响应式）
-    │   ├── RestaurantCard.jsx  # 餐厅卡片组件
-    │   ├── SearchFilter.jsx    # 搜索筛选栏
-    │   ├── AddRestaurantModal.jsx  # 添加餐厅弹窗
-    │   └── ReviewModal.jsx     # 写评价弹窗
+    │   ├── Navbar.jsx              # Responsive top nav
+    │   ├── RestaurantCard.jsx      # Card with ratings and facility tags
+    │   ├── SearchFilter.jsx        # Filter bar (city, cuisine, price, sort)
+    │   ├── AddRestaurantModal.jsx  # Full form modal for new listings
+    │   └── ReviewModal.jsx         # Write-a-review modal
     └── pages/
         ├── Home.jsx
         ├── MapPage.jsx
@@ -81,21 +75,14 @@ frontend/
 
 ---
 
-## 技术依赖
+## Key Dependencies
 
-| 库 | 用途 |
-|----|------|
-| React 18 | UI 框架 |
-| React Router v6 | 客户端路由 |
-| Vite | 构建工具 |
-| Tailwind CSS | 原子化样式 |
-| Leaflet + react-leaflet | 交互地图（OpenStreetMap，免费无需 API Key） |
-| Recharts | 数据可视化图表 |
-| Axios | HTTP 请求 |
-
----
-
-## 注意事项
-
-- 地图使用 OpenStreetMap 底图，完全免费，无需申请任何 API Key。
-- 所有数据请求通过 Vite 代理转发到后端，生产部署时需配置 Nginx 反向代理或修改 API 地址。
+| Package | Purpose |
+|---------|---------|
+| React 18 | UI framework |
+| React Router v6 | Client-side routing |
+| Vite | Build tool and dev server |
+| Tailwind CSS | Utility-first styling |
+| Leaflet + react-leaflet | Interactive map (OpenStreetMap — no API key needed) |
+| Recharts | Bar, pie, and radar charts |
+| Axios | HTTP client |

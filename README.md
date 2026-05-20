@@ -1,24 +1,24 @@
-# 🐾 Pet Dinner — 宠物友好餐厅仪表盘
+# 🐾 Pet Dinner — Pet-Friendly Restaurant Dashboard
 
-发现最适合您和毛孩子的友好餐厅。Pet Dinner 是一个全栈应用，包含 **Web 端**和 **移动端（iOS / Android）**，共享同一套后端 API。
+Find the perfect restaurant to dine with your furry companion. Pet Dinner is a full-stack application with a **Web app** and a **Mobile app (iOS / Android)**, both powered by the same backend API.
 
 ---
 
-## 项目结构
+## Project Structure
 
 ```
 Pet-dinner/
-├── backend/          # Node.js + Express + SQLite 后端 API
-├── frontend/         # React + Vite Web 端
-├── mobile/           # React Native + Expo 移动端
-└── package.json      # 根目录脚本
+├── backend/          # Node.js + Express + SQLite REST API
+├── frontend/         # React + Vite web app
+├── mobile/           # React Native + Expo mobile app
+└── package.json      # Root-level scripts
 ```
 
 ---
 
-## 快速启动
+## Quick Start
 
-### 第一步：启动后端（必须先启动）
+### Step 1 — Start the backend (required first)
 
 ```bash
 cd backend
@@ -26,9 +26,9 @@ npm install
 node server.js
 ```
 
-后端运行在 `http://localhost:3001`，首次启动会自动创建 SQLite 数据库并写入示例数据（10 家餐厅、12 条评价）。
+The API runs on `http://localhost:3001`. On first launch it creates a SQLite database and seeds it with 10 sample restaurants and 12 reviews across 6 Chinese cities.
 
-### 第二步：启动 Web 端
+### Step 2 — Start the web app
 
 ```bash
 cd frontend
@@ -36,9 +36,9 @@ npm install
 npm run dev
 ```
 
-打开浏览器访问 `http://localhost:5173`
+Open `http://localhost:5173` in your browser.
 
-### 第三步：启动移动端（可选）
+### Step 3 — Start the mobile app (optional)
 
 ```bash
 cd mobile
@@ -46,51 +46,50 @@ npm install
 npx expo start
 ```
 
-用手机安装 **Expo Go** App，扫描终端中显示的二维码即可预览。
+Install **Expo Go** on your phone and scan the QR code shown in the terminal.
 
-> **真机调试注意**：需将 `mobile/src/api/client.js` 中的 `localhost:3001` 改为电脑的局域网 IP（如 `192.168.1.100:3001`），否则手机无法连接后端。
-
----
-
-## 技术栈
-
-| 层级 | 技术 |
-|------|------|
-| 后端 | Node.js · Express · SQLite (better-sqlite3) |
-| Web 前端 | React 18 · Vite · Tailwind CSS · Recharts · Leaflet |
-| 移动端 | React Native · Expo 51 · React Navigation · react-native-maps · react-native-chart-kit |
+> **Real-device note:** change `localhost:3001` in `mobile/src/api/client.js` to your machine's local network IP (e.g. `192.168.1.100:3001`) so the phone can reach the backend.
 
 ---
 
-## 核心功能
+## Tech Stack
 
-- **餐厅搜索与筛选** — 按城市、菜系、价格区间、宠物体型、设施多维筛选
-- **交互地图** — 地图标注所有餐厅位置，点击查看详情
-- **用户评价系统** — 综合评分 + 宠物友好评分双维度
-- **添加餐厅** — 任何用户可提交新餐厅信息
-- **社区动态** — 最新评价流 + 带宠物外出指南
-- **数据分析仪表盘** — 城市分布、菜系占比、价格评分对比、设施覆盖率、市场洞察建议
-
----
-
-## API 接口概览
-
-| 方法 | 路径 | 说明 |
-|------|------|------|
-| GET | `/api/restaurants` | 获取餐厅列表（支持筛选参数） |
-| GET | `/api/restaurants/:id` | 获取餐厅详情（含评价） |
-| POST | `/api/restaurants` | 添加新餐厅 |
-| POST | `/api/reviews` | 提交评价 |
-| GET | `/api/reviews/recent` | 获取最新评价流 |
-| GET | `/api/analytics/overview` | 统计概览 |
-| GET | `/api/analytics/insights` | 市场洞察建议 |
-
-完整 API 文档见 [`backend/routes/`](./backend/routes/)。
+| Layer | Technologies |
+|-------|-------------|
+| Backend | Node.js · Express · SQLite (better-sqlite3) |
+| Web frontend | React 18 · Vite · Tailwind CSS · Recharts · Leaflet |
+| Mobile app | React Native · Expo 51 · React Navigation · react-native-maps · react-native-chart-kit |
 
 ---
 
-## 子模块文档
+## Features
 
-- [后端说明](./backend/README.md)（内嵌在本文件，见上方 API 表格）
-- [Web 端说明](./frontend/README.md)
-- [移动端说明](./mobile/README.md)
+- **Search & filter** — filter by city, cuisine, price range, pet size, and available facilities
+- **Interactive map** — pin every restaurant on a map and tap for details
+- **Dual-rating reviews** — separate scores for overall experience and pet-friendliness
+- **Add a restaurant** — any user can submit a new listing
+- **Community feed** — latest reviews stream and dining-with-pets guides
+- **Analytics dashboard** — city distribution, cuisine breakdown, price-vs-rating charts, facility coverage, and data-driven market insights
+
+---
+
+## API Reference
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/restaurants` | List restaurants (filterable via query params) |
+| GET | `/api/restaurants/:id` | Restaurant detail with reviews |
+| POST | `/api/restaurants` | Create a new restaurant |
+| POST | `/api/reviews` | Submit a review |
+| GET | `/api/reviews/recent` | Latest reviews feed |
+| GET | `/api/analytics/overview` | Aggregate statistics |
+| GET | `/api/analytics/insights` | Data-driven market recommendations |
+
+Full route source: [`backend/routes/`](./backend/routes/)
+
+---
+
+## Sub-project Docs
+
+- [Web app README](./frontend/README.md)
+- [Mobile app README](./mobile/README.md)

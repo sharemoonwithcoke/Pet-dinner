@@ -1,0 +1,66 @@
+<!-- City filter -->
+<view class="city-bar">
+  <scroll-view scroll-x class="city-scroll">
+    <view
+      wx:for="{{['全部'].concat(cities)}}"
+      wx:key="index"
+      class="city-chip {{(index === 0 && !selectedCity) || selectedCity === item ? 'active' : ''}}"
+      bindtap="onCityTap"
+      data-city="{{index === 0 ? '' : item}}"
+    >{{item}}</view>
+  </scroll-view>
+  <view class="count-badge">{{restaurants.length}} 家</view>
+</view>
+
+<!-- Map -->
+<map
+  id="petMap"
+  class="pet-map"
+  latitude="{{center.latitude}}"
+  longitude="{{center.longitude}}"
+  scale="{{scale}}"
+  markers="{{markers}}"
+  show-location
+  bindmarkertap="onMarkerTap"
+  bindtap="onMapTap"
+></map>
+
+<!-- Bottom restaurant strip -->
+<view class="bottom-strip">
+  <view class="strip-title">附近餐厅</view>
+  <scroll-view scroll-x class="strip-scroll">
+    <view
+      wx:for="{{restaurants}}"
+      wx:key="id"
+      class="mini-card {{selectedId === item.id ? 'selected' : ''}}"
+      bindtap="onMiniCardTap"
+      data-id="{{item.id}}"
+      data-lat="{{item.latitude}}"
+      data-lng="{{item.longitude}}"
+    >
+      <view class="mini-name">{{item.name}}</view>
+      <view class="mini-info">{{item.city}} · {{item.cuisine}}</view>
+      <view class="mini-footer">
+        <text class="mini-price">{{priceMap[item.price_range]}}</text>
+        <text wx:if="{{item.avg_rating}}" class="mini-rating">⭐ {{item.avg_rating}}</text>
+      </view>
+      <view class="mini-link" bindtap="goDetail" data-id="{{item.id}}" catchtap="goDetail" data-id="{{item.id}}">查看详情 →</view>
+    </view>
+  </scroll-view>
+</view>
+
+<!-- Callout overlay (selected restaurant popup) -->
+<view class="callout-overlay" wx:if="{{selected}}" bindtap="clearSelected">
+  <view class="callout-card" catchtap="">
+    <view class="callout-name">{{selected.name}}</view>
+    <view class="callout-info">{{selected.cuisine}} · {{priceMap[selected.price_range]}}</view>
+    <view class="callout-location">📍 {{selected.address}}</view>
+    <view wx:if="{{selected.avg_rating}}" class="callout-rating">
+      ⭐ {{selected.avg_rating}} · 🐾 {{selected.avg_pet_rating}}
+    </view>
+    <view class="callout-actions">
+      <view class="callout-btn secondary" bindtap="clearSelected">关闭</view>
+      <view class="callout-btn primary" bindtap="goDetail" data-id="{{selected.id}}">查看详情</view>
+    </view>
+  </view>
+</view>

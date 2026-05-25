@@ -1,0 +1,104 @@
+<scroll-view scroll-y style="height:100vh">
+  <view class="page-content" wx:if="{{!loading}}">
+
+    <!-- Overview stat cards -->
+    <view class="stat-grid">
+      <view class="stat-card" wx:for="{{statCards}}" wx:key="label">
+        <text class="stat-icon">{{item.icon}}</text>
+        <text class="stat-value" style="color:{{item.color}}">{{item.value}}</text>
+        <text class="stat-label">{{item.label}}</text>
+      </view>
+    </view>
+
+    <!-- Market insights -->
+    <view class="card insight-section" wx:if="{{insights.length}}">
+      <view class="section-title">💡 市场洞察与建议</view>
+      <view wx:for="{{insights}}" wx:key="title" class="insight-card">
+        <text class="insight-icon">{{item.icon}}</text>
+        <view class="insight-body">
+          <text class="insight-title">{{item.title}}</text>
+          <text class="insight-content">{{item.content}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- City bar chart (CSS-based) -->
+    <view class="card chart-section" wx:if="{{cityChart.length}}">
+      <view class="section-title">各城市餐厅数量</view>
+      <view wx:for="{{cityChart}}" wx:key="city" class="bar-row">
+        <text class="bar-label">{{item.city}}</text>
+        <view class="bar-track">
+          <view class="bar-fill" style="width:{{item.pct}}%"></view>
+        </view>
+        <text class="bar-value">{{item.restaurant_count}}</text>
+      </view>
+    </view>
+
+    <!-- Rating distribution -->
+    <view class="card chart-section" wx:if="{{ratingDist.length}}">
+      <view class="section-title">评分分布</view>
+      <view wx:for="{{ratingDist}}" wx:key="rating" class="bar-row">
+        <text class="bar-label">{{item.rating}}星</text>
+        <view class="bar-track">
+          <view class="bar-fill rating-fill" style="width:{{item.pct}}%"></view>
+        </view>
+        <text class="bar-value">{{item.count}}条 ({{item.pct}}%)</text>
+      </view>
+    </view>
+
+    <!-- Cuisine breakdown -->
+    <view class="card chart-section" wx:if="{{cuisineChart.length}}">
+      <view class="section-title">菜系分布</view>
+      <view class="cuisine-grid">
+        <view wx:for="{{cuisineChart}}" wx:key="cuisine" class="cuisine-item">
+          <view class="cuisine-bar-wrap">
+            <view class="cuisine-bar" style="height:{{item.pct}}%; background:{{item.color}}"></view>
+          </view>
+          <text class="cuisine-value">{{item.count}}</text>
+          <text class="cuisine-name">{{item.cuisine}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- Facility coverage -->
+    <view class="card chart-section" wx:if="{{overview}}">
+      <view class="section-title">设施覆盖率</view>
+      <view class="facility-grid">
+        <view wx:for="{{facilityItems}}" wx:key="label" class="facility-item">
+          <text class="facility-pct">{{item.pct}}%</text>
+          <view class="facility-bar-bg">
+            <view class="facility-bar-fill" style="height:{{item.pct}}%"></view>
+          </view>
+          <text class="facility-label">{{item.label}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- Top restaurants leaderboard -->
+    <view class="card chart-section" wx:if="{{topRestaurants.length}}">
+      <view class="section-title">🏆 宠物友好餐厅排行</view>
+      <view
+        wx:for="{{topRestaurants}}"
+        wx:key="id"
+        class="rank-row"
+        bindtap="goDetail"
+        data-id="{{item.id}}"
+      >
+        <view class="rank-badge {{item.rankClass}}">{{index + 1}}</view>
+        <view class="rank-info">
+          <text class="rank-name">{{item.name}}</text>
+          <text class="rank-sub">{{item.city}} · {{item.cuisine}}</text>
+        </view>
+        <view class="rank-scores">
+          <text class="rank-overall">⭐ {{item.avg_rating}}</text>
+          <text class="rank-pet">🐾 {{item.avg_pet_rating}}</text>
+        </view>
+      </view>
+    </view>
+
+  </view>
+
+  <view class="loading" wx:if="{{loading}}">
+    <text>数据分析加载中...</text>
+  </view>
+</scroll-view>

@@ -1,0 +1,92 @@
+<scroll-view scroll-y style="height:100vh">
+<view class="form-page">
+
+  <view class="form-group">
+    <text class="label">餐厅名称 <text class="required">*</text></text>
+    <input class="input" value="{{form.name}}" bindinput="set" data-key="name" placeholder="例：汪星人花园餐厅" placeholder-class="ph"/>
+  </view>
+
+  <view class="form-row">
+    <view class="form-group half">
+      <text class="label">城市 <text class="required">*</text></text>
+      <input class="input" value="{{form.city}}" bindinput="set" data-key="city" placeholder="上海" placeholder-class="ph"/>
+    </view>
+    <view class="form-group half">
+      <text class="label">菜系 <text class="required">*</text></text>
+      <input class="input" value="{{form.cuisine}}" bindinput="set" data-key="cuisine" placeholder="中式料理" placeholder-class="ph"/>
+    </view>
+  </view>
+
+  <view class="form-group">
+    <text class="label">详细地址 <text class="required">*</text></text>
+    <input class="input" value="{{form.address}}" bindinput="set" data-key="address" placeholder="静安区南京西路1号" placeholder-class="ph"/>
+  </view>
+
+  <view class="form-row">
+    <view class="form-group half">
+      <text class="label">联系电话</text>
+      <input class="input" value="{{form.phone}}" bindinput="set" data-key="phone" placeholder="021-12345678" type="number" placeholder-class="ph"/>
+    </view>
+    <view class="form-group half">
+      <text class="label">官网</text>
+      <input class="input" value="{{form.website}}" bindinput="set" data-key="website" placeholder="www.example.com" placeholder-class="ph"/>
+    </view>
+  </view>
+
+  <view class="form-row">
+    <view class="form-group half">
+      <text class="label">纬度 <text class="required">*</text></text>
+      <input class="input" value="{{form.latitude}}" bindinput="set" data-key="latitude" placeholder="31.2304" type="digit" placeholder-class="ph"/>
+    </view>
+    <view class="form-group half">
+      <text class="label">经度 <text class="required">*</text></text>
+      <input class="input" value="{{form.longitude}}" bindinput="set" data-key="longitude" placeholder="121.4737" type="digit" placeholder-class="ph"/>
+    </view>
+  </view>
+
+  <!-- Price range -->
+  <view class="form-group">
+    <text class="label">价格区间</text>
+    <view class="option-row">
+      <view wx:for="{{priceOptions}}" wx:key="value" class="option-chip {{form.price_range === item.value ? 'active' : ''}}" bindtap="setOption" data-key="price_range" data-value="{{item.value}}">{{item.label}}</view>
+    </view>
+  </view>
+
+  <!-- Pet area -->
+  <view class="form-group">
+    <text class="label">宠物区域</text>
+    <view class="option-row">
+      <view wx:for="{{areaOptions}}" wx:key="value" class="option-chip {{form.pet_area === item.value ? 'active' : ''}}" bindtap="setOption" data-key="pet_area" data-value="{{item.value}}">{{item.label}}</view>
+    </view>
+  </view>
+
+  <!-- Size limit -->
+  <view class="form-group">
+    <text class="label">体型限制</text>
+    <view class="option-row">
+      <view class="option-chip {{form.pet_size_limit === 'all' ? 'active' : ''}}" bindtap="setOption" data-key="pet_size_limit" data-value="all">🐾 欢迎所有体型</view>
+      <view class="option-chip {{form.pet_size_limit === 'small' ? 'active' : ''}}" bindtap="setOption" data-key="pet_size_limit" data-value="small">🐕 仅限小型宠物</view>
+    </view>
+  </view>
+
+  <!-- Facilities -->
+  <view class="form-group">
+    <text class="label">宠物友好设施</text>
+    <view wx:for="{{facilityFields}}" wx:key="key" class="switch-row">
+      <text class="switch-label">{{item.label}}</text>
+      <switch checked="{{form[item.key]}}" bindchange="onSwitch" data-key="{{item.key}}" color="#f97316"/>
+    </view>
+  </view>
+
+  <view class="form-group">
+    <text class="label">宠物政策说明</text>
+    <textarea class="textarea" value="{{form.pet_policy}}" bindinput="set" data-key="pet_policy" placeholder="请描述餐厅的宠物政策..." placeholder-class="ph" auto-height/>
+  </view>
+
+  <view class="submit-btn {{submitting ? 'disabled' : ''}}" bindtap="submit">
+    {{submitting ? '提交中...' : '✅ 提交餐厅'}}
+  </view>
+
+  <view style="height:60rpx"></view>
+</view>
+</scroll-view>

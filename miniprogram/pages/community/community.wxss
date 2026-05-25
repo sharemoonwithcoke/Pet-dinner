@@ -1,0 +1,51 @@
+/* Tab bar */
+.tab-bar {
+  display: flex;
+  background: #fff;
+  border-bottom: 2rpx solid #f3f4f6;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.tab {
+  flex: 1;
+  text-align: center;
+  padding: 28rpx 0;
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #9ca3af;
+  border-bottom: 4rpx solid transparent;
+}
+.tab.active { color: #f97316; border-bottom-color: #f97316; }
+.tab-count  { font-size: 22rpx; background: #fff7ed; color: #f97316; padding: 2rpx 10rpx; border-radius: 20rpx; margin-left: 6rpx; }
+
+.tab-content { height: calc(100vh - 108rpx - 100rpx); padding: 24rpx; }
+
+/* Review card */
+.reviews-list .card { margin-bottom: 20rpx; }
+.review-card  { padding: 28rpx; }
+.review-header{ display: flex; align-items: flex-start; gap: 16rpx; margin-bottom: 20rpx; }
+.avatar { width: 72rpx; height: 72rpx; border-radius: 50%; background: #fff7ed; color: #f97316; font-size: 32rpx; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.author-info  { flex: 1; }
+.author-row   { display: flex; align-items: center; gap: 12rpx; margin-bottom: 6rpx; }
+.author-name  { font-size: 30rpx; font-weight: 700; color: #111827; }
+.pet-tag      { font-size: 22rpx; background: #f3f4f6; color: #9ca3af; padding: 4rpx 12rpx; border-radius: 10rpx; }
+.review-date  { font-size: 22rpx; color: #d1d5db; }
+.review-scores{ text-align: right; }
+.score-row    { display: flex; align-items: center; gap: 6rpx; justify-content: flex-end; margin-bottom: 4rpx; }
+.stars        { color: #facc15; font-size: 24rpx; }
+.score-num    { font-size: 24rpx; color: #6b7280; }
+.pet-score    { font-size: 22rpx; color: #7c3aed; }
+.review-content { font-size: 28rpx; color: #374151; line-height: 1.7; margin-bottom: 20rpx; }
+.restaurant-link { display: inline-block; background: #fff7ed; color: #f97316; font-size: 24rpx; font-weight: 600; padding: 10rpx 20rpx; border-radius: 12rpx; }
+
+/* Tips */
+.tips-list .card { margin-bottom: 20rpx; }
+.tip-card    { padding: 28rpx; }
+.tip-header  { display: flex; align-items: center; gap: 20rpx; }
+.tip-icon    { font-size: 48rpx; flex-shrink: 0; }
+.tip-title-wrap { flex: 1; }
+.tip-title   { font-size: 30rpx; font-weight: 700; color: #111827; display: block; margin-bottom: 8rpx; }
+.tip-category{ font-size: 22rpx; background: #fff7ed; color: #f97316; padding: 4rpx 12rpx; border-radius: 10rpx; font-weight: 600; }
+.tip-arrow   { font-size: 22rpx; color: #9ca3af; }
+.tip-content { display: block; font-size: 26rpx; color: #374151; line-height: 1.8; margin-top: 24rpx; padding-top: 24rpx; border-top: 2rpx solid #f3f4f6; white-space: pre-line; }

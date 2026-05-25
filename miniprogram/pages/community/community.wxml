@@ -1,0 +1,71 @@
+<!-- Tab switcher -->
+<view class="tab-bar">
+  <view class="tab {{activeTab === 'reviews' ? 'active' : ''}}" bindtap="switchTab" data-tab="reviews">
+    💬 最新动态 <text class="tab-count" wx:if="{{reviews.length}}">{{reviews.length}}</text>
+  </view>
+  <view class="tab {{activeTab === 'tips' ? 'active' : ''}}" bindtap="switchTab" data-tab="tips">
+    📖 外出指南 <text class="tab-count" wx:if="{{tips.length}}">{{tips.length}}</text>
+  </view>
+</view>
+
+<!-- Reviews tab -->
+<scroll-view scroll-y class="tab-content" wx:if="{{activeTab === 'reviews'}}">
+  <view wx:if="{{loading}}" class="loading"><text>加载中...</text></view>
+
+  <view wx:elif="{{reviews.length === 0}}" class="empty-state">
+    <text class="empty-icon">💬</text>
+    <text class="empty-text">还没有评价，去写第一条吧！</text>
+  </view>
+
+  <view wx:else class="reviews-list">
+    <view wx:for="{{reviews}}" wx:key="id" class="card review-card">
+      <view class="review-header">
+        <view class="avatar">{{item.author[0]}}</view>
+        <view class="author-info">
+          <view class="author-row">
+            <text class="author-name">{{item.author}}</text>
+            <text wx:if="{{item.pet_name}}" class="pet-tag">🐾 {{item.pet_name}}</text>
+          </view>
+          <text class="review-date">{{item.dateStr}}</text>
+        </view>
+        <view class="review-scores">
+          <view class="score-row">
+            <text class="stars">{{item.starStr}}</text>
+            <text class="score-num">{{item.rating}}</text>
+          </view>
+          <text class="pet-score">🐾 {{item.pet_rating}}</text>
+        </view>
+      </view>
+
+      <text class="review-content">{{item.content}}</text>
+
+      <view class="restaurant-link" bindtap="goRestaurant" data-id="{{item.restaurant_id}}">
+        🍽️ {{item.restaurant_name}} · {{item.city}}
+      </view>
+    </view>
+  </view>
+</scroll-view>
+
+<!-- Tips tab -->
+<scroll-view scroll-y class="tab-content" wx:if="{{activeTab === 'tips'}}">
+  <view wx:if="{{loading}}" class="loading"><text>加载中...</text></view>
+  <view wx:else class="tips-list">
+    <view
+      wx:for="{{tips}}"
+      wx:key="id"
+      class="card tip-card"
+      bindtap="toggleTip"
+      data-id="{{item.id}}"
+    >
+      <view class="tip-header">
+        <text class="tip-icon">{{item.icon}}</text>
+        <view class="tip-title-wrap">
+          <text class="tip-title">{{item.title}}</text>
+          <text class="tip-category">{{item.category}}</text>
+        </view>
+        <text class="tip-arrow">{{expandedTips[item.id] ? '▲' : '▼'}}</text>
+      </view>
+      <text wx:if="{{expandedTips[item.id]}}" class="tip-content">{{item.content}}</text>
+    </view>
+  </view>
+</scroll-view>

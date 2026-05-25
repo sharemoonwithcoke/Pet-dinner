@@ -1,0 +1,152 @@
+<scroll-view scroll-y style="height:100vh" wx:if="{{restaurant}}">
+
+  <!-- Hero -->
+  <view class="hero-card">
+    <view class="hero-row">
+      <view class="hero-left">
+        <view class="name">{{restaurant.name}}</view>
+        <view class="location">📍 {{restaurant.city}} · {{restaurant.address}}</view>
+        <view wx:if="{{restaurant.phone}}"   class="meta-row">📞 {{restaurant.phone}}</view>
+        <view wx:if="{{restaurant.website}}" class="meta-row">🌐 {{restaurant.website}}</view>
+      </view>
+      <view class="hero-right">
+        <view class="price">{{priceMap[restaurant.price_range]}}</view>
+        <view class="cuisine">{{restaurant.cuisine}}</view>
+      </view>
+    </view>
+
+    <view class="ratings-grid">
+      <view class="rating-cell">
+        <text class="rating-cell-label">综合评分</text>
+        <text class="stars">{{restaurant.starStr}}</text>
+        <view class="rating-cell-row">
+          <text class="rating-big">{{restaurant.avg_rating || '—'}}</text>
+          <text class="review-count">（{{restaurant.review_count}}条评价）</text>
+        </view>
+      </view>
+      <view class="rating-cell border-left">
+        <text class="rating-cell-label">宠物友好</text>
+        <text class="stars pet">{{restaurant.petStarStr}}</text>
+        <text class="rating-big pet">{{restaurant.avg_pet_rating || '—'}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- Pet policy -->
+  <view class="card info-section">
+    <view class="section-title">🐾 宠物政策</view>
+    <view class="policy-grid">
+      <view class="policy-item">
+        <text class="policy-label">区域</text>
+        <text class="policy-value">{{areaMap[restaurant.pet_area]}}</text>
+      </view>
+      <view class="policy-item">
+        <text class="policy-label">体型限制</text>
+        <text class="policy-value">{{restaurant.pet_size_limit === 'all' ? '欢迎所有体型' : '仅限小型宠物'}}</text>
+      </view>
+    </view>
+    <view wx:if="{{restaurant.pet_policy}}" class="policy-note">{{restaurant.pet_policy}}</view>
+  </view>
+
+  <!-- Facilities -->
+  <view class="card info-section" wx:if="{{facilities.length}}">
+    <view class="section-title">✅ 宠物友好设施</view>
+    <view class="facilities-wrap">
+      <view wx:for="{{facilities}}" wx:key="label" class="facility-badge">
+        <text class="facility-icon">{{item.icon}}</text>
+        <text class="facility-label">{{item.label}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- Reviews -->
+  <view class="card info-section">
+    <view class="reviews-header">
+      <view class="section-title" style="margin-bottom:0">💬 用户评价（{{reviews.length}}）</view>
+      <view class="write-btn" bindtap="openReviewForm">✍️ 写评价</view>
+    </view>
+
+    <view wx:if="{{reviews.length === 0}}" class="no-reviews">
+      <text>还没有评价，来写第一条吧！</text>
+      <view class="write-first-btn" bindtap="openReviewForm">写第一条评价</view>
+    </view>
+
+    <view wx:for="{{reviews}}" wx:key="id" class="review-item">
+      <view class="review-top">
+        <view class="avatar">{{item.author[0]}}</view>
+        <view class="review-meta">
+          <text class="review-author">{{item.author}}</text>
+          <text wx:if="{{item.pet_name}}" class="review-pet">🐾 {{item.pet_name}} · {{item.pet_type}}</text>
+        </view>
+        <view class="review-right">
+          <view class="score-row">
+            <text class="stars">{{item.starStr}}</text>
+            <text class="score-num">{{item.rating}}</text>
+          </view>
+          <text class="pet-score">宠物友好 {{item.pet_rating}}⭐</text>
+          <text class="review-date">{{item.dateStr}}</text>
+        </view>
+      </view>
+      <text class="review-text">{{item.content}}</text>
+    </view>
+  </view>
+
+  <view style="height:60rpx"></view>
+</scroll-view>
+
+<!-- Loading state -->
+<view class="loading" wx:if="{{!restaurant && !loadError}}"><text>加载中...</text></view>
+<view class="empty-state" wx:if="{{loadError}}">
+  <text class="empty-icon">😕</text>
+  <text class="empty-text">餐厅不存在</text>
+</view>
+
+<!-- Review form popup -->
+<view class="overlay" wx:if="{{showReviewForm}}" bindtap="closeReviewForm">
+  <view class="popup" catchtap="">
+    <view class="popup-header">
+      <text class="popup-title">✍️ 写评价</text>
+      <text class="popup-close" bindtap="closeReviewForm">✕</text>
+    </view>
+
+    <view class="form-group">
+      <text class="form-label">您的昵称 *</text>
+      <input class="form-input" value="{{reviewForm.author}}" bindinput="onFormInput" data-key="author" placeholder="请输入昵称" placeholder-class="form-placeholder"/>
+    </view>
+
+    <view class="form-group">
+      <text class="form-label">综合评分 *</text>
+      <view class="star-picker">
+        <text wx:for="{{[1,2,3,4,5]}}" wx:key="*this" class="star-pick {{item <= reviewForm.rating ? 'filled' : ''}}" bindtap="setRating" data-val="{{item}}">★</text>
+      </view>
+    </view>
+
+    <view class="form-group">
+      <text class="form-label">宠物友好评分 *</text>
+      <view class="star-picker">
+        <text wx:for="{{[1,2,3,4,5]}}" wx:key="*this" class="star-pick pet {{item <= reviewForm.pet_rating ? 'filled-pet' : ''}}" bindtap="setPetRating" data-val="{{item}}">★</text>
+      </view>
+    </view>
+
+    <view class="form-group">
+      <text class="form-label">评价内容 *</text>
+      <textarea class="form-textarea" value="{{reviewForm.content}}" bindinput="onFormInput" data-key="content" placeholder="分享您和宠物的用餐体验..." placeholder-class="form-placeholder" auto-height></textarea>
+    </view>
+
+    <view class="form-row">
+      <view class="form-group half">
+        <text class="form-label">宠物名字</text>
+        <input class="form-input" value="{{reviewForm.pet_name}}" bindinput="onFormInput" data-key="pet_name" placeholder="豆豆" placeholder-class="form-placeholder"/>
+      </view>
+      <view class="form-group half">
+        <text class="form-label">宠物类型</text>
+        <input class="form-input" value="{{reviewForm.pet_type}}" bindinput="onFormInput" data-key="pet_type" placeholder="金毛、柴犬..." placeholder-class="form-placeholder"/>
+      </view>
+    </view>
+
+    <view class="popup-actions">
+      <view class="btn-secondary" bindtap="closeReviewForm">取消</view>
+      <view class="btn-primary {{submitting ? 'disabled' : ''}}" bindtap="submitReview">{{submitting ? '提交中...' : '提交评价'}}</view>
+    </view>
+  </view>
+</view>

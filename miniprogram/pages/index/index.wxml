@@ -1,0 +1,135 @@
+<!-- Hero banner -->
+<view class="hero">
+  <view class="hero-emoji">🐾</view>
+  <view class="hero-title">带上毛孩子，一起去觅食</view>
+  <view class="hero-sub">发现最适合您和宠物的友好餐厅</view>
+  <view class="hero-stats" wx:if="{{stats}}">
+    <view class="stat-item">
+      <text class="stat-value">{{stats.totalRestaurants}}</text>
+      <text class="stat-label">家餐厅</text>
+    </view>
+    <view class="stat-item">
+      <text class="stat-value">{{stats.totalCities}}</text>
+      <text class="stat-label">个城市</text>
+    </view>
+    <view class="stat-item">
+      <text class="stat-value">{{stats.totalReviews}}</text>
+      <text class="stat-label">条评价</text>
+    </view>
+  </view>
+</view>
+
+<!-- Search bar -->
+<view class="search-wrap">
+  <view class="search-bar">
+    <text class="search-icon">🔍</text>
+    <input
+      class="search-input"
+      placeholder="搜索餐厅名称、菜系..."
+      placeholder-class="search-placeholder"
+      value="{{filters.search}}"
+      bindinput="onSearch"
+      confirm-type="search"
+    />
+    <text wx:if="{{filters.search}}" class="clear-btn" bindtap="clearSearch">✕</text>
+  </view>
+</view>
+
+<!-- Filters -->
+<view class="filter-section">
+  <!-- City -->
+  <scroll-view scroll-x class="filter-row">
+    <view
+      wx:for="{{['全部城市'].concat(cities)}}"
+      wx:key="index"
+      class="filter-chip {{(index === 0 && !filters.city) || filters.city === item ? 'active' : ''}}"
+      bindtap="onCityTap"
+      data-city="{{index === 0 ? '' : item}}"
+    >{{item}}</view>
+  </scroll-view>
+
+  <!-- Price -->
+  <scroll-view scroll-x class="filter-row">
+    <view
+      wx:for="{{priceOptions}}"
+      wx:key="value"
+      class="filter-chip {{filters.price_range === item.value ? 'active' : ''}}"
+      bindtap="onPriceTap"
+      data-value="{{item.value}}"
+    >{{item.label}}</view>
+  </scroll-view>
+
+  <!-- Pet size + facilities -->
+  <scroll-view scroll-x class="filter-row">
+    <view class="filter-chip {{filters.pet_size_limit === 'all' ? 'active' : ''}}" bindtap="onSizeTap" data-value="all">🐾 全体型</view>
+    <view class="filter-chip {{filters.pet_size_limit === 'small' ? 'active' : ''}}" bindtap="onSizeTap" data-value="small">🐕 小型犬</view>
+    <view class="filter-chip {{filters.has_pet_menu ? 'active' : ''}}" bindtap="toggleFacility" data-key="has_pet_menu">🍖 宠物菜单</view>
+    <view class="filter-chip {{filters.has_pet_bowls ? 'active' : ''}}" bindtap="toggleFacility" data-key="has_pet_bowls">🥣 宠物水碗</view>
+  </scroll-view>
+
+  <!-- Count + add button -->
+  <view class="count-row">
+    <text class="count-text">找到 {{restaurants.length}} 家餐厅</text>
+    <view class="add-btn" bindtap="goAdd">＋ 添加餐厅</view>
+  </view>
+</view>
+
+<!-- Restaurant list -->
+<view class="page-content" wx:if="{{!loading}}">
+  <view wx:if="{{restaurants.length === 0}}" class="empty-state">
+    <text class="empty-icon">🔍</text>
+    <text class="empty-text">没有找到符合条件的餐厅</text>
+  </view>
+
+  <view
+    wx:for="{{restaurants}}"
+    wx:key="id"
+    class="card restaurant-card"
+    bindtap="onCardTap"
+    data-id="{{item.id}}"
+  >
+    <!-- Card header -->
+    <view class="card-header">
+      <view class="card-header-left">
+        <view class="restaurant-name">{{item.name}}</view>
+        <view class="restaurant-location">📍 {{item.city}} · {{item.address}}</view>
+      </view>
+      <view class="card-header-right">
+        <view class="price-label">{{priceMap[item.price_range]}}</view>
+        <view class="cuisine-label">{{item.cuisine}}</view>
+      </view>
+    </view>
+
+    <!-- Ratings -->
+    <view class="ratings-row">
+      <view class="rating-block">
+        <view class="rating-label">综合</view>
+        <view class="rating-stars">
+          <text class="stars">{{item.starStr}}</text>
+          <text class="rating-num">{{item.avg_rating || '—'}}</text>
+        </view>
+      </view>
+      <view class="rating-block">
+        <view class="rating-label">宠物友好</view>
+        <view class="rating-stars">
+          <text class="stars pet-stars">{{item.petStarStr}}</text>
+          <text class="rating-num pet-num">{{item.avg_pet_rating || '—'}}</text>
+        </view>
+      </view>
+      <view class="review-count">{{item.review_count || 0}} 评价</view>
+    </view>
+
+    <!-- Tags -->
+    <view class="tags-row">
+      <text class="tag tag-blue">{{areaMap[item.pet_area]}}</text>
+      <text wx:if="{{item.pet_size_limit === 'all'}}" class="tag tag-green">🐾 欢迎所有宠物</text>
+      <text wx:else class="tag tag-purple">🐕 仅限小型犬</text>
+      <text wx:if="{{item.has_pet_menu}}" class="tag tag-orange">🍖 宠物菜单</text>
+      <text wx:if="{{item.has_pet_bowls}}" class="tag tag-orange">🥣 宠物水碗</text>
+    </view>
+  </view>
+</view>
+
+<view class="loading" wx:if="{{loading}}">
+  <text>加载中...</text>
+</view>

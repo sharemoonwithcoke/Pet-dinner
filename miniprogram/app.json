@@ -1,0 +1,31 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/map/map",
+    "pages/community/community",
+    "pages/analytics/analytics",
+    "pages/detail/detail",
+    "pages/add-restaurant/add-restaurant"
+  ],
+  "tabBar": {
+    "color": "#9ca3af",
+    "selectedColor": "#f97316",
+    "borderStyle": "white",
+    "backgroundColor": "#ffffff",
+    "list": [
+      { "pagePath": "pages/index/index",       "text": "首页" },
+      { "pagePath": "pages/map/map",           "text": "地图" },
+      { "pagePath": "pages/community/community","text": "社区" },
+      { "pagePath": "pages/analytics/analytics","text": "数据分析" }
+    ]
+  },
+  "window": {
+    "backgroundColor": "#f9fafb",
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#ffffff",
+    "navigationBarTitleText": "Pet Dinner 🐾",
+    "navigationBarTextStyle": "black"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

@@ -1,0 +1,42 @@
+services:
+  # ── Backend API ──────────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: pet-dinner-api
+    restart: unless-stopped
+    environment:
+      PORT: "3001"
+      # SQLite file lives inside the named volume so data survives restarts
+      DB_PATH: /app/data/petdinner.db
+    volumes:
+      - sqlite_data:/app/data
+    ports:
+      # Expose to the host for direct API testing (curl, Postman, etc.)
+      # Remove this mapping in production if you only need the frontend to reach it.
+      - "3001:3001"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3001/api/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  # ── Web frontend (React → Nginx) ─────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: pet-dinner-web
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+
+# Named volume — data persists across `docker compose down` / `up` cycles.
+# To wipe all data: docker compose down -v
+volumes:
+  sqlite_data:

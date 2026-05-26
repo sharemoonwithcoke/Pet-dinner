@@ -9,6 +9,8 @@ A full-stack pet-friendly restaurant discovery platform with four client surface
 | **Mobile App** | React Native + Expo 51 | iOS & Android |
 | **Mini Program** | WeChat native WXML/JS | China (WeChat ecosystem) |
 
+> **Docker:** the web version (backend + frontend) ships with a `docker-compose.yml` for one-command deployment. See [§ Docker Deployment](#docker-deployment).
+
 ---
 
 ## Table of Contents
@@ -23,10 +25,11 @@ A full-stack pet-friendly restaurant discovery platform with four client surface
 8. [Environment Configuration](#8-environment-configuration)
 9. [Running in Development](#9-running-in-development)
 10. [Building for Production](#10-building-for-production)
-11. [Deployment Guide](#11-deployment-guide)
-12. [Project-by-Project Deep Dive](#12-project-by-project-deep-dive)
-13. [Troubleshooting](#13-troubleshooting)
-14. [Roadmap & Future Integrations](#14-roadmap--future-integrations)
+11. [Docker Deployment](#docker-deployment)
+12. [Deployment Guide](#12-deployment-guide)
+13. [Project-by-Project Deep Dive](#13-project-by-project-deep-dive)
+14. [Troubleshooting](#14-troubleshooting)
+15. [Roadmap & Future Integrations](#15-roadmap--future-integrations)
 
 ---
 
@@ -885,7 +888,178 @@ npx expo run:android --variant release
 
 ---
 
-## 11. Deployment Guide
+## Docker Deployment
+
+Docker is the recommended way to run the web version in any environment. Two containers are orchestrated by `docker-compose.yml`:
+
+| Container | Image base | What it does |
+|-----------|-----------|-------------|
+| `pet-dinner-api` | `node:22-alpine` | Runs `node server.js`, exposes port 3001 |
+| `pet-dinner-web` | `nginx:1.27-alpine` | Serves the React build, proxies `/api/*` to the backend |
+
+### File layout
+
+```
+Pet-dinner/
+├── docker-compose.yml         # Orchestrates both containers + SQLite volume
+├── backend/
+│   ├── Dockerfile             # node:22-alpine, npm ci --omit=dev
+│   └── .dockerignore
+└── frontend/
+    ├── Dockerfile             # multi-stage: node build → nginx serve
+    ├── nginx.conf             # SPA fallback + /api/ proxy + gzip + asset caching
+    └── .dockerignore
+```
+
+### Container architecture
+
+```
+Host
+  │
+  ├── :80  ──► pet-dinner-web  (nginx:1.27-alpine)
+  │               │  serves /usr/share/nginx/html  (React build)
+  │               │  /api/*  ──► proxy_pass http://backend:3001
+  │               │                    │
+  │               └────────────────────┤  Docker internal network
+  │                                    │
+  ├── :3001 ──► pet-dinner-api  (node:22-alpine)
+  │               │  node server.js
+  │               │  DB_PATH=/app/data/petdinner.db
+  │               │
+  └── sqlite_data (named volume)  ──► /app/data/petdinner.db
+```
+
+Nginx resolves `backend` via Docker Compose's internal DNS — no hard-coded IPs needed.
+
+The SQLite database lives in a **named volume** (`sqlite_data`) so data persists across container restarts and rebuilds.
+
+### Quick start
+
+```bash
+# Build images and start both containers in the background
+docker compose up -d --build
+
+# Check both containers are healthy
+docker compose ps
+
+# Follow live logs
+docker compose logs -f
+
+# Verify the API is reachable through Nginx
+curl http://localhost/api/health
+# → {"status":"ok"}
+
+# Open the web app
+open http://localhost        # macOS
+xdg-open http://localhost    # Linux
+```
+
+> On first start, the backend seeds the database automatically (10 restaurants, 12 reviews, 5 tips). This only runs once — subsequent starts reuse the existing `sqlite_data` volume.
+
+### Common commands
+
+```bash
+# Stop containers (data preserved in the volume)
+docker compose down
+
+# Stop and DELETE all data (wipes the sqlite_data volume)
+docker compose down -v
+
+# Rebuild a single service after code changes
+docker compose build backend
+docker compose build frontend
+docker compose up -d
+
+# Open a shell inside the backend container
+docker compose exec backend sh
+
+# Dump the SQLite database out of the volume
+docker compose exec backend sqlite3 /app/data/petdinner.db .dump > backup.sql
+
+# View backend logs only
+docker compose logs -f backend
+```
+
+### Environment variables
+
+Set these in `docker-compose.yml` under `services.backend.environment`, or in a `.env` file at the project root:
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `PORT` | `3001` | Port the Express server listens on inside the container |
+| `DB_PATH` | `/app/data/petdinner.db` | Absolute path to the SQLite file |
+
+### Changing the exposed port
+
+The web app defaults to port 80. To run on a different host port (e.g. 8080):
+
+```yaml
+# docker-compose.yml
+services:
+  frontend:
+    ports:
+      - "8080:80"   # host:container
+```
+
+### Production hardening checklist
+
+- [ ] Remove the `3001:3001` port mapping from `backend` in `docker-compose.yml` — only Nginx needs to reach it, not the public internet
+- [ ] Add SSL: put an Nginx or Caddy reverse proxy in front that handles HTTPS and forwards to port 80
+- [ ] Tighten CORS in `backend/server.js`: `cors({ origin: 'https://your-domain.com' })`
+- [ ] Set `NODE_ENV=production` in the backend environment
+- [ ] Add a `--memory` / `--cpus` limit to each service
+
+### Nginx configuration details (`frontend/nginx.conf`)
+
+| Directive | Value | Purpose |
+|-----------|-------|---------|
+| `proxy_pass` | `http://backend:3001` | Forwards `/api/*` to the backend container by service name |
+| `try_files $uri $uri/ /index.html` | — | SPA routing — unknown paths serve `index.html` |
+| `gzip on` | JS, CSS, JSON, SVG | Reduces payload size |
+| `expires 1y` | `.js`, `.css`, fonts, images | Long-lived cache for fingerprinted assets |
+| `proxy_read_timeout` | `30s` | Prevents Nginx from dropping slow API responses |
+
+### Backend Dockerfile explained
+
+```dockerfile
+FROM node:22-alpine          # minimal base ~50 MB
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm ci --omit=dev        # install production deps only, no devDependencies
+
+COPY . .
+RUN mkdir -p /app/data       # create mount point for the SQLite volume
+
+EXPOSE 3001
+CMD ["node", "server.js"]
+```
+
+### Frontend Dockerfile explained
+
+```dockerfile
+# Stage 1 — build the React app
+FROM node:22-alpine AS builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci                   # includes devDependencies (Vite, Tailwind, etc.)
+COPY . .
+RUN npm run build            # outputs to /app/dist
+
+# Stage 2 — serve with Nginx (~25 MB)
+FROM nginx:1.27-alpine
+COPY --from=builder /app/dist /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
+```
+
+The builder stage is discarded after the copy — the final image contains **only Nginx + the compiled assets**, not Node.js or source code.
+
+---
+
+## 12. Deployment Guide
 
 ### Recommended stack for a single-server deployment
 

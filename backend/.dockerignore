@@ -1,0 +1,5 @@
+node_modules/
+petdinner.db
+petdinner.db-shm
+petdinner.db-wal
+*.log
